@@ -72,5 +72,8 @@ Collective variables: [Fu et al. J. Chem. Theory Comput. 2017, 13, 5173–5178](
 Colvars module: [Fiorin et al. Mol. Phys. 2013, 111, 3345–3362](https://www.tandfonline.com/doi/full/10.1080/00268976.2013.813594) and [Fiorin et al. J. Phys. Chem. B 2024, 128, 11108–11123](https://pubs.acs.org/doi/10.1021/acs.jpcb.4c05604)<br>
 The "mother" of all restraint-based binding free-energy calculations: [Hermans et al. Isr. J. Chem. 1986, 27, 225–227](https://onlinelibrary.wiley.com/doi/abs/10.1002/ijch.198600032)<br>
 
+## Disclaimer
+The methods, protocols, and computational workflows implemented in BFEE3 are provided as practical recommendations for conducting the relevant calculations. They are not intended to guarantee the correctness of any resulting data or conclusions, nor should they be regarded as the only acceptable procedures for performing such calculations.
+
 ## Contact us
 This software is distributed under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) license. For more information about BFEE, please contact Haohao Fu (fhh2626@nankai.edu.cn) and Haochuan Chen (yjcoshc@mail.nankai.edu.cn).
