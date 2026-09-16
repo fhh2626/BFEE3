@@ -176,11 +176,16 @@ Plots forward and backward ΔG vs. λ. Non-overlapping curves indicate hysteresi
 - "Bidirectional fepout": Provide forward and backward `*.fepout` files.
 - "Bidirectional log": Provide forward and backward `*.log` files.
 - "Double-wide fepout": Provide a single double-wide `*.fepout` file.
+
+Troubleshooting:
+1. Geometrical PMF/WTM-λABF: A time plateau in PMF RMSD is necessary (not sufficient) for convergence; PMFs are also typically smooth. If unconverged, extend the simulation or use more windows.
+2. FEP/TI: Use "Plot hysteresis"; overlapping forward/backward ΔG-vs-λ curves are necessary (not sufficient) for convergence. If unconverged, use more windows in the GUI.
+3. FEP/LDDM: Occasional "atom moving too fast" errors arise because the decoupled region behaves like a small molecule in vacuum. Reduce the time step or use hydrogen mass repartitioning (HMR); HMR requires regenerating the PSF/PARM7 topology.
 """
 
 BFEEControl = """
 BFEE3 usage notes:
-- Ask the user: task (protein–protein; protein–ligand: geometrical/WTM-λABF-DDM/LDDM), ligand rigidity (rigid/flexible), and whether HMR or OPLS is used.
+- Ask the user: task (protein–protein; protein–ligand: geometrical/WTM-λABF-DDM/LDDM), ligand rigidity (rigid/flexible), and whether HMR or OPLS is used. Also remind them to mention if the protein is a membrane protein; otherwise assume it is not.
 - If the user asks which route to use, explain the reason, not just the recommendation: protein–protein -> streamlined geometrical route; rigid protein–ligand -> usually LDDM; flexible ligand -> geometrical route or WTM-λABF-DDM; deeply buried/tortuous binding path -> WTM-λABF-DDM or LDDM preferred; exposed/interfacial binding with a clear dissociation path -> geometrical route is natural.
 - Keep "Other recommended options" at defaults unless the user asks to change them.
 1. Features (available skills):
