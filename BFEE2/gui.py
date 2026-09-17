@@ -128,6 +128,12 @@ class mainSettings(QWidget):
         self.openAICompatibleKeyLineEdit = QLineEdit("")
         self.openAICompatibleModelLabel = QLabel("Model:")
         self.openAICompatibleModelLineEdit = QLineEdit("")
+        self.openAICompatibleReasoningEffortLabel = QLabel("Reasoning Effort:")
+        self.openAICompatibleReasoningEffortComboBox = QComboBox()
+        self.openAICompatibleReasoningEffortComboBox.addItems(
+            ["low", "medium", "high"]
+        )
+        self.openAICompatibleReasoningEffortComboBox.setCurrentText("medium")
         self.openAICompatibleTemperatureLabel = QLabel("Temperature:")
         self.openAICompatibleTemperatureLineEdit = QLineEdit("")
         self.openAICompatibleTopPLabel = QLabel("Top P:")
@@ -149,16 +155,22 @@ class mainSettings(QWidget):
             self.openAICompatibleModelLineEdit, 2, 1
         )
         self.onlineAIServiceGridLayout.addWidget(
-            self.openAICompatibleTemperatureLabel, 3, 0
+            self.openAICompatibleReasoningEffortLabel, 3, 0
         )
         self.onlineAIServiceGridLayout.addWidget(
-            self.openAICompatibleTemperatureLineEdit, 3, 1
+            self.openAICompatibleReasoningEffortComboBox, 3, 1
         )
         self.onlineAIServiceGridLayout.addWidget(
-            self.openAICompatibleTopPLabel, 4, 0
+            self.openAICompatibleTemperatureLabel, 4, 0
         )
         self.onlineAIServiceGridLayout.addWidget(
-            self.openAICompatibleTopPLineEdit, 4, 1
+            self.openAICompatibleTemperatureLineEdit, 4, 1
+        )
+        self.onlineAIServiceGridLayout.addWidget(
+            self.openAICompatibleTopPLabel, 5, 0
+        )
+        self.onlineAIServiceGridLayout.addWidget(
+            self.openAICompatibleTopPLineEdit, 5, 1
         )
 
         # OK and Cancel
@@ -197,7 +209,17 @@ class mainSettings(QWidget):
 
         self.vmdLineEdit.setText(lines[0])
 
-        if len(lines) >= 7:
+        if len(lines) >= 8:
+            self.openAICompatibleAPIAddressLineEdit.setText(lines[1])
+            self.openAICompatibleKeyLineEdit.setText(lines[2])
+            self.openAICompatibleModelLineEdit.setText(lines[3])
+            if lines[4] in ("low", "medium", "high"):
+                self.openAICompatibleReasoningEffortComboBox.setCurrentText(lines[4])
+            self.openAICompatibleTemperatureLineEdit.setText(lines[5])
+            self.openAICompatibleTopPLineEdit.setText(lines[6])
+            saved_theme = lines[7]
+        elif len(lines) >= 7:
+            # Previous OpenAI-compatible config without reasoning effort.
             self.openAICompatibleAPIAddressLineEdit.setText(lines[1])
             self.openAICompatibleKeyLineEdit.setText(lines[2])
             self.openAICompatibleModelLineEdit.setText(lines[3])
@@ -231,6 +253,9 @@ class mainSettings(QWidget):
             cFile.write(self.openAICompatibleAPIAddressLineEdit.text() + "\n")
             cFile.write(self.openAICompatibleKeyLineEdit.text() + "\n")
             cFile.write(self.openAICompatibleModelLineEdit.text() + "\n")
+            cFile.write(
+                self.openAICompatibleReasoningEffortComboBox.currentText() + "\n"
+            )
             cFile.write(self.openAICompatibleTemperatureLineEdit.text() + "\n")
             cFile.write(self.openAICompatibleTopPLineEdit.text() + "\n")
             cFile.write(self.currentTheme + "\n")
@@ -813,6 +838,10 @@ class AIAssistantDialog(QWidget):
             model = (
                 self.parent.mainSettings.openAICompatibleModelLineEdit.text().strip()
             )
+            reasoning_effort = (
+                self.parent.mainSettings.openAICompatibleReasoningEffortComboBox
+                .currentText()
+            )
             # optional parameters
             temperature_text = (
                 self.parent.mainSettings.openAICompatibleTemperatureLineEdit.text()
@@ -872,6 +901,7 @@ class AIAssistantDialog(QWidget):
                     {"role": "system", "content": rags.systemPrompt},
                     {"role": "user", "content": self.messageHistory},
                 ],
+                "reasoning_effort": reasoning_effort,
             }
             if temperature_text:
                 try:

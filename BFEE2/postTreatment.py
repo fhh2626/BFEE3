@@ -20,6 +20,25 @@ class RStarTooLargeError(RuntimeError):
     def __init__(self, arg):
         self.args = arg
 
+
+def _numberAfterLabel(tokens, index, tokenLower, label):
+    """Return the number after a label such as 'lambda=' or 'dA/dlambda='.
+
+    The value may be the next token ('lambda= 0.20') or glued to the label
+    ('lambda=0.20'). Return None if this token is not the given label.
+    """
+
+    if tokenLower == label:
+        if index + 1 >= len(tokens):
+            return None
+        return float(tokens[index + 1])
+
+    if tokenLower.startswith(label) and len(tokenLower) > len(label):
+        return float(tokens[index].split('=', 1)[1])
+
+    return None
+
+
 class postTreatment:
     """the post-treatment of BFEE outputs
     """
@@ -517,6 +536,8 @@ class postTreatment:
         Args:
             filePath (str): path of the fepout file
             rigidLigand (bool): whether dealing with a rigid ligand. Default to False.
+                Kept for compatibility; the number of CVs is inferred from
+                consecutive rows that share the same lambda.
         
         Returns:
             tuple (2D np.array): lambda-free energy relationship
@@ -525,21 +546,44 @@ class postTreatment:
         Lambda = []
         dA_dLambda = []
 
-        if rigidLigand:
-            numCVs = 6
-        else:
-            numCVs = 7
+        # rigidLigand used to select 6 vs 7 CVs. Kept in the signature for
+        # compatibility; numCVs is now inferred from the log itself.
+        # if rigidLigand:
+        #     numCVs = 6
+        # else:
+        #     numCVs = 7
 
         with open(filePath, 'r', encoding='utf-8') as fepoutFile:
             for line in fepoutFile.readlines():
-                if not ('dA/dLambda' in line):
-                    continue
+                lambdaValue = None
+                dA_dLambdaValue = None
                 splitedLine = line.strip().split()
-                Lambda.append(float(splitedLine[4]))
-                dA_dLambda.append(float(splitedLine[6]))
+                for i, token in enumerate(splitedLine):
+                    tokenLower = token.lower()
+                    parsedDA_dLambda = _numberAfterLabel(
+                        splitedLine, i, tokenLower, 'da/dlambda='
+                    )
+                    if parsedDA_dLambda is not None:
+                        dA_dLambdaValue = parsedDA_dLambda
+                        continue
+                    parsedLambda = _numberAfterLabel(
+                        splitedLine, i, tokenLower, 'lambda='
+                    )
+                    if parsedLambda is not None:
+                        lambdaValue = parsedLambda
+
+                if lambdaValue is None or dA_dLambdaValue is None:
+                    continue
+                Lambda.append(lambdaValue)
+                dA_dLambda.append(dA_dLambdaValue)
                 
-        # seven CVs in total with the same Lambda in the step 2
+        # Multiple CVs at the same lambda (step 2) print one dA/dLambda row each.
+        # Infer numCVs from the first run of identical lambda values.
         if Lambda[0] == Lambda[1]:
+            numCVs = 1
+            while numCVs < len(Lambda) and Lambda[numCVs] == Lambda[0]:
+                numCVs += 1
+
             correctedLambda = []
             correctedDA_dLambda = []
             
@@ -821,9 +865,10 @@ class postTreatment:
                                         error, and contribution of the restraints
         """
         force_contants, centers = self._LDDMReadColvarsTmp(colvars_tmp_path)
-        colvars_parser = py_bar.ColvarsParser(cvtrj_path, steps_per_window, equilbration_steps_per_window, 
+        colvars_parser = py_bar.ColvarsParser(cvtrj_path, steps_per_window, equilbration_steps_per_window,
                                     force_contants, centers,
-                                    np.linspace(0, 1, num_windows))
+                                    np.linspace(0, 1, num_windows),
+                                    temperature)
         window, deltaU = colvars_parser.get_data()
         b = py_bar.FEPAnalyzer(window, deltaU, temperature)
 

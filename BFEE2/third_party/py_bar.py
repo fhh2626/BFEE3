@@ -205,7 +205,9 @@ class ColvarsParser:
             equilibration_per_window: int,
             force_constants: List[int],
             centers: List[int],
-            lambda_list: List[float]) -> None:
+            lambda_list: List[float],
+            temperature: float = 300) -> None:
+        self._temperature = temperature
         
         self._windows, self._deltaU_data = self._read_double_wide_cvtrj(
                                                     cvtrj_file,
@@ -365,10 +367,10 @@ class ColvarsParser:
         forceConstanttheta *= (180 / math.pi)**2
         forceConstantphi *= (180 / math.pi)**2
 
-        contribution = BOLTZMANN * 300 * math.log(
+        contribution = BOLTZMANN * self._temperature * math.log(
             8 * (math.pi**2) * CSTAR / ((R**2) * math.sin(eulerTheta) * math.sin(polarTheta)) * \
             math.sqrt(forceConstantTheta * forceConstantPhi * forceConstantPsi * forceConstanttheta * \
-            forceConstantphi * forceConstantR ) / ((2 * math.pi * BOLTZMANN * 300)**3)
+            forceConstantphi * forceConstantR ) / ((2 * math.pi * BOLTZMANN * self._temperature)**3)
         )
         return contribution
 
@@ -570,11 +572,11 @@ class FEPAnalyzer:
 
         for i in range(n_bootstrap):
             forward_bootstrap = np.zeros(bootstrap_samples * block_size, dtype=int)
-            for idx, j in enumerate(np.random.randint(0, forward_size - block_size - 1, bootstrap_samples)):
+            for idx, j in enumerate(np.random.randint(0, forward_size - block_size + 1, bootstrap_samples)):
                 forward_bootstrap[idx*block_size:idx*block_size+block_size] = j + np.arange(block_size)
                     
             backward_bootstrap = np.zeros(bootstrap_samples * block_size, dtype=int)
-            for idx, j in enumerate(np.random.randint(0, backward_size - block_size - 1, bootstrap_samples)):
+            for idx, j in enumerate(np.random.randint(0, backward_size - block_size + 1, bootstrap_samples)):
                 backward_bootstrap[idx*block_size:idx*block_size+block_size] = j + np.arange(block_size)
             
             estimates[i] = self._BAR_estimator(
