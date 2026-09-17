@@ -75,5 +75,8 @@ The "mother" of all restraint-based binding free-energy calculations: [Hermans e
 ## Disclaimer
 The methods, protocols, and computational workflows implemented in BFEE3 are provided as practical recommendations for conducting the relevant calculations. They are not intended to guarantee the correctness of any resulting data or conclusions, nor should they be regarded as the only acceptable procedures for performing such calculations.
 
+## Data Security
+API keys are stored locally only. Molecular structure files and force field files are also accessed and processed locally. If a third-party LLM service is used, user conversation content will be sent to the provider. We therefore recommend providers that supports Zero Data Retention (ZDR).
+
 ## Contact us
 This software is distributed under the [GPLv3](https://www.gnu.org/licenses/gpl-3.0.en.html) license. For more information about BFEE, please contact Haohao Fu (fhh2626@nankai.edu.cn) and Haochuan Chen (yjcoshc@mail.nankai.edu.cn).
