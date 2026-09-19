@@ -72,6 +72,7 @@ __PROGRAM_NAME__ = f"BFEEstimator v{BFEE2.version.__VERSION__}"
 __NAMD_VERSION__ = f"v{BFEE2.version.__NAMD_VERSION__}"
 __GMX_VERSION__ = f"{BFEE2.version.__GMX_VERSION__}"
 __DEFAULT_OPENROUTER_BASE_URL__ = "https://openrouter.ai/api/v1"
+_ICON_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "icon", "icon.png")
 
 
 class mainSettings(QWidget):
@@ -90,7 +91,7 @@ class mainSettings(QWidget):
         self._initSingalsSlots()
         self.setWindowTitle("Settings")
         self.setWindowTitle("Settings")
-        self.setWindowIcon(QIcon("BFEE2/icon/icon.png"))
+        self.setWindowIcon(QIcon(_ICON_PATH))
         self.currentTheme = "dark"  # Default theme
         self._readConfig()
         # self.setGeometry(0,0,0,0)
@@ -281,7 +282,7 @@ class geometricAdvancedSettings(QWidget):
         self._initUI()
         self._initSingalsSlots()
         self.setWindowTitle("Advanced settings for the geometrical route")
-        self.setWindowIcon(QIcon("BFEE2/icon/icon.png"))
+        self.setWindowIcon(QIcon(_ICON_PATH))
         self.setGeometry(0, 0, 0, 0)
         # self.show()
 
@@ -517,7 +518,7 @@ class alchemicalAdvancedSettings(QWidget):
         self._initUI()
         self._initSingalsSlots()
         self.setWindowTitle("Advanced settings for the alchemical route")
-        self.setWindowIcon(QIcon("BFEE2/icon/icon.png"))
+        self.setWindowIcon(QIcon(_ICON_PATH))
         self.setGeometry(0, 0, 0, 0)
         # self.show()
 
@@ -1194,7 +1195,7 @@ class mainUI(QMainWindow):
 
         self.setGeometry(0, 0, 0, 0)
         self.setWindowTitle(__PROGRAM_NAME__)
-        self.setWindowIcon(QIcon("BFEE2/icon/icon.png"))
+        self.setWindowIcon(QIcon(_ICON_PATH))
         self.show()
 
         self._showMDEngineVersionWarning()
@@ -1230,7 +1231,7 @@ class mainUI(QMainWindow):
                     os.path.dirname(os.path.abspath(__file__)), "styles", style_file
                 )
                 if os.path.exists(style_path):
-                    with open(style_path, "r") as f:
+                    with open(style_path, "r", encoding="utf-8") as f:
                         app.setStyleSheet(f.read())
                 else:
                     print(f"Style file not found: {style_path}")
