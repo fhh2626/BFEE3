@@ -2372,13 +2372,6 @@ Please use the same or a later version of NAMD or GROMACS if you have any proble
         self.plotHysteresisLayout.addLayout(self.plotHysteresisForwardLayout)
         self.plotHysteresisLayout.addLayout(self.plotHysteresisBackwardLayout)
 
-        self.isRigidLigandCheckbox = QCheckBox("Rigid ligand (ligand RMSD restraints):")
-        self.isRigidLigandCheckbox.setChecked(False)
-        self.isRigidLigandCheckbox.setEnabled(
-            False
-        )  # Disabled by default (Bidirectional fepout)
-
-        self.plotHysteresisLayout.addWidget(self.isRigidLigandCheckbox)
         self.plotHysteresisLayout.addLayout(self.plotHysteresisButtonLayout)
 
         self.plotHysteresis.setLayout(self.plotHysteresisLayout)
@@ -2484,7 +2477,6 @@ Please use the same or a later version of NAMD or GROMACS if you have any proble
             self.plotHysteresisForwardButton.setEnabled(True)
             self.plotHysteresisBackwardLineEdit.setEnabled(True)
             self.plotHysteresisBackwardButton.setEnabled(True)
-            self.isRigidLigandCheckbox.setEnabled(False)
         elif self.plotHysteresisRadioBidirectionalLog.isChecked():
             # Bidirectional log: both rows enabled with log labels
             self.plotHysteresisForwardLabel.setText("Forward (log):")
@@ -2493,7 +2485,6 @@ Please use the same or a later version of NAMD or GROMACS if you have any proble
             self.plotHysteresisForwardButton.setEnabled(True)
             self.plotHysteresisBackwardLineEdit.setEnabled(True)
             self.plotHysteresisBackwardButton.setEnabled(True)
-            self.isRigidLigandCheckbox.setEnabled(True)
         elif self.plotHysteresisRadioDoubleWideFepout.isChecked():
             # Double-wide fepout: only first row enabled, second row disabled
             self.plotHysteresisForwardLabel.setText("Double-wide (fepout):")
@@ -2502,7 +2493,6 @@ Please use the same or a later version of NAMD or GROMACS if you have any proble
             self.plotHysteresisForwardButton.setEnabled(True)
             self.plotHysteresisBackwardLineEdit.setEnabled(False)
             self.plotHysteresisBackwardButton.setEnabled(False)
-            self.isRigidLigandCheckbox.setEnabled(False)
 
     def _changeMergePmfTypeState(self):
         """enable/disable and update labels for merge PMF based on radio button selection"""
@@ -3843,16 +3833,8 @@ Unknown error!",
                     "namd",
                     "alchemical",
                 )
-                forwardProfile = np.transpose(
-                    pTreat._tiLogFile(
-                        forwardFilePath, self.isRigidLigandCheckbox.isChecked()
-                    )
-                )
-                backwardProfile = np.transpose(
-                    pTreat._tiLogFile(
-                        backwardFilePath, self.isRigidLigandCheckbox.isChecked()
-                    )
-                )
+                forwardProfile = np.transpose(pTreat._tiLogFile(forwardFilePath))
+                backwardProfile = np.transpose(pTreat._tiLogFile(backwardFilePath))
 
             return forwardProfile, backwardProfile
 
